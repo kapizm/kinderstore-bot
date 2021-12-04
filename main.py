@@ -1,8 +1,21 @@
 from src.bot import bot
+from src import config
+
+WEBHOOK_URL_TEMPLATE = 'https://{}.herokuapp.com/{}'
 
 
 def main():
-    bot.start_polling()
+    if config.HEROKU_APP_NAME:
+        bot.start_webhook(
+            listen='0.0.0.0',
+            port=config.PORT,
+            url_path=config.TOKEN,
+            webhook_url=WEBHOOK_URL_TEMPLATE.format(
+                config.HEROKU_APP_NAME, config.TOKEN,
+            ),
+        )
+    else:
+        bot.start_polling()
     bot.idle()
 
 
