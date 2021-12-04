@@ -1,7 +1,10 @@
 from src.bot import bot
 
-def main(): 
+
+def main():
     bot.start_polling()
     bot.idle()
+
+
 if __name__ == '__main__':
     main()
