@@ -4,6 +4,9 @@ from telegram.ext import (
     MessageHandler,
 )
 
+from src import database
+from src.models import User
+
 
 def start_handler(update: Update, context: CallbackContext):
     reply_keyboard = [['Зарегистрировать чек', 'Проверить свои чеки']]
@@ -18,6 +21,13 @@ def start_handler(update: Update, context: CallbackContext):
 
 
 def registration_handler(update: Update, context: CallbackContext):
+    with database.Session() as session:
+        users = session.query(User).filter(User.telegram_id == update.message.from_user.id)
+
+    if users:
+        update.message.reply_text('Вы уже зарегистрированы')
+        return ConversationHandler.END
+
     update.message.reply_text(
         'Здравствуйте! Рады приветствовать Вас в розыгрыше «Игрушки покупай '
         '– машину забирай» от сети детских магазинов KinderStore! Розыгрыш '
@@ -28,9 +38,21 @@ def registration_handler(update: Update, context: CallbackContext):
         'местному времени. Тех. поддержка +7 702 8 777',
     )
     update.message.reply_text(
-        'Для успешной регистрации в розыгрыше Вам необходимо ввести своё имя '
-        'и фамилию:',
+        'Для успешной регистрации в розыгрыше Вам необходимо ввести своё полное имя:',
     )
+    return 'registration_name'
+
+
+def registration_name_handler(update: Update, context: CallbackContext):
+    user = User(
+        telegram_id=update.message.from_user.id,
+        full_name=update.message.text,
+    )
+
+    with database.Session() as session, session.begin():
+        session.add(user)
+
+    update.message.reply_text('Пользователь сохранен')
     return ConversationHandler.END
 
 
@@ -53,6 +75,11 @@ conversation_handler = ConversationHandler(
             ),
             MessageHandler(
                 Filters.regex('^Проверить свои чеки$'), check_handler,
+            ),
+        ],
+        'registration_name': [
+            MessageHandler(
+                Filters.text, registration_name_handler,
             ),
         ],
     },
