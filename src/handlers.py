@@ -22,7 +22,9 @@ def start_handler(update: Update, context: CallbackContext):
 
 def registration_handler(update: Update, context: CallbackContext):
     with database.Session() as session:
-        users = session.query(User).filter(User.telegram_id == update.message.from_user.id)
+        users = session.query(User).filter(
+            User.telegram_id == update.message.from_user.id,
+        )
 
     if users:
         update.message.reply_text('Вы уже зарегистрированы')
@@ -38,7 +40,8 @@ def registration_handler(update: Update, context: CallbackContext):
         'местному времени. Тех. поддержка +7 702 8 777',
     )
     update.message.reply_text(
-        'Для успешной регистрации в розыгрыше Вам необходимо ввести своё полное имя:',
+        'Для успешной регистрации в розыгрыше Вам необходимо '
+        'ввести своё полное имя:',
     )
     return 'registration_name'
 
