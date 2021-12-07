@@ -11,6 +11,9 @@ python-dotenv = "*"
 pytest = "*"
 flake8 = "==3.9.2"
 pytest-flake8 = "*"
+flake8-commas = "*"
+flake8-quotes = "*"
+flake8-import-order = "*"
 
 [requires]
 python_version = "3.9"
