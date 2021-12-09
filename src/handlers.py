@@ -32,12 +32,12 @@ def registration_handler(update: Update, context: CallbackContext):
 
     update.message.reply_text(
         'Здравствуйте! Рады приветствовать Вас в розыгрыше «Игрушки покупай '
-        '– машину забирай» от сети детских магазинов KinderStore! Розыгрыш '
+        '– машину забирай» от сети детских магазинов KinderStore!/nРозыгрыш '
         'состоится в прямом эфире на нашей инстаграм странице '
         'Kinderstore_astana, подпишитесь что быть в курсе! С условиями '
-        'конкурса вы можете ознакомиться по данной ссылке ______ Дата '
+        'конкурса вы можете ознакомиться по данной ссылке ______/nДата '
         'розыгрыша 10 января 2022 года в г. Нур-Султан, в 14:00 по '
-        'местному времени. Тех. поддержка +7 702 8 777',
+        'местному времени./nТех. поддержка +7 702 8 777',
     )
     update.message.reply_text(
         'Для успешной регистрации в розыгрыше Вам необходимо '
@@ -56,7 +56,38 @@ def registration_name_handler(update: Update, context: CallbackContext):
         session.add(user)
 
     update.message.reply_text('Пользователь сохранен')
-    return ConversationHandler.END
+    update.message.reply_text('Введите свой номер телефона')
+    return 'phone_number'
+
+
+def phone_handler(update: Update, context: CallbackContext):
+    query = database.session.query(User)
+    query = query.Filter(User.telegram_id == update.message.from_user.id)
+    record = query.one()
+    record.phone_number = update.message.text
+
+    update.message.reply_text(
+        'Спасибо! Пожалуйста, введите Ваш никнейм '
+        'в Instagram',
+    )
+    return 'ig_account'
+
+
+def ig_account_handler(update: Update, context: CallbackContext):
+    query = database.session.query(User)
+    query = query.Filter(User.telegram_id == update.message.from_user.id)
+    record = query.one()
+    record.ig_account = update.message.text
+
+    update.message.reply_text(
+        'Отлично! Пожалуйста, введите номер Вашего чека '
+        'с магазина KinderStore',
+    )
+    return 'store_check'
+
+
+def registration_end_handler(update: Update, context: CallbackContext):
+    pass
 
 
 def check_handler(update: Update, context: CallbackContext):
