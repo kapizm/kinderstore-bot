@@ -3,7 +3,7 @@ from telegram.ext import CommandHandler, ConversationHandler, Updater, CallbackC
 
 from src import config, database
 from src.models import User
-from src.handlers import registration
+from src.handlers import registration, add_check
 
 bot = Updater(token=config.TOKEN)
 
@@ -51,7 +51,7 @@ conversation_handler = ConversationHandler(
     states={
         'SELECT_ACTION': [
             registration.conversation_handler,
-            CallbackQueryHandler(add_check_handler, pattern='^add_check$'),
+            add_check.conversation_handler,
             CallbackQueryHandler(my_checks_handler, pattern='^my_checks$'),
         ],
     },
