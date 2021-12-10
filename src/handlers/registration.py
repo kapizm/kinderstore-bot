@@ -1,43 +1,13 @@
-from telegram import ReplyKeyboardMarkup, Update
-from telegram.ext import (
-    CallbackContext, CommandHandler, ConversationHandler, Filters,
-    MessageHandler,
-)
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import ConversationHandler, CallbackContext, CallbackQueryHandler, Filters, MessageHandler
 
 from src import database
 from src.models import User
 
 
-NAME, PHONE_NUMBER, INSTAGRAM = range(3)
-
-
-def start_handler(update: Update, context: CallbackContext):
-    with database.Session() as session:
-        user = session.query(User).filter(
-            User.telegram_id == update.message.from_user.id,
-        ).first()
-
-    if user:
-        update.message.reply_text(
-            f'{user.full_name}, вы уже зарегистрированы',
-            reply_markup=ReplyKeyboardMarkup([['Зарегистрировать чек']]),
-        )
-        return ConversationHandler.END
-
-    update.message.reply_text(
-        'Здравствуйте! Рады приветствовать Вас в розыгрыше «Игрушки покупай '
-        '– машину забирай» от сети детских магазинов KinderStore!/nРозыгрыш '
-        'состоится в прямом эфире на нашей инстаграм странице '
-        'Kinderstore_astana, подпишитесь что быть в курсе! С условиями '
-        'конкурса вы можете ознакомиться по данной ссылке ______/nДата '
-        'розыгрыша 10 января 2022 года в г. Нур-Султан, в 14:00 по '
-        'местному времени./nТех. поддержка +7 702 8 777',
-    )
-    update.message.reply_text(
-        'Для успешной регистрации в розыгрыше Вам необходимо '
-        'ввести своё полное имя',
-    )
-    return NAME
+def register_handler(update: Update, context: CallbackContext):
+    update.callback_query.edit_message_text('Введите свое полное имя')
+    return 'SAVE_NAME_ACTION'
 
 
 def save_name_handler(update: Update, context: CallbackContext):
@@ -50,7 +20,7 @@ def save_name_handler(update: Update, context: CallbackContext):
         session.add(user)
 
     update.message.reply_text('Введите свой номер телефона')
-    return PHONE_NUMBER
+    return 'SAVE_PHONE_NUMBER_ACTION'
 
 
 def save_phone_number_handler(update: Update, context: CallbackContext):
@@ -62,7 +32,7 @@ def save_phone_number_handler(update: Update, context: CallbackContext):
         session.commit()
 
     update.message.reply_text('Введите свой никнейм в instagram')
-    return INSTAGRAM
+    return 'SAVE_INSTAGRAM_ACTION'
 
 
 def save_instagram_handler(update: Update, context: CallbackContext):
@@ -72,30 +42,29 @@ def save_instagram_handler(update: Update, context: CallbackContext):
         ).first()
         user.ig_account = update.message.text
         session.commit()
-        update.message.reply_text(
-            f'{user.full_name}, вы успешно зарегистрировались',
-            reply_markup=ReplyKeyboardMarkup([['Зарегистрировать чек']]),
-        )
 
-    return ConversationHandler.END
-
-
-def cancel_handler(update: Update, context: CallbackContext):
-    return ConversationHandler.END
+    buttons = [
+        [InlineKeyboardButton('Зарегистрировать чек', callback_data='add_check')],
+        [InlineKeyboardButton('Мои чеки', callback_data='my_checks')],
+    ]
+    update.message.reply_text(
+        'Вы успешно зарегистрировались',
+        reply_markup=InlineKeyboardMarkup(buttons),
+    )
+    return 'END_ACTION'
 
 
 conversation_handler = ConversationHandler(
-    entry_points=[CommandHandler('start', start_handler)],
+    entry_points=[
+        CallbackQueryHandler(register_handler, pattern='^registration$'),
+    ],
     states={
-        NAME: [MessageHandler(
-            Filters.text, save_name_handler,
-        )],
-        PHONE_NUMBER: [MessageHandler(
-            Filters.text, save_phone_number_handler,
-        )],
-        INSTAGRAM: [MessageHandler(
-            Filters.text, save_instagram_handler,
-        )],
+        'SAVE_NAME_ACTION': [MessageHandler(Filters.text, save_name_handler)],
+        'SAVE_PHONE_NUMBER_ACTION': [MessageHandler(Filters.text, save_phone_number_handler)],
+        'SAVE_INSTAGRAM_ACTION': [MessageHandler(Filters.text, save_instagram_handler)],
     },
-    fallbacks=[CommandHandler('cancel', cancel_handler)],
+    fallbacks=[],
+    map_to_parent={
+        'END_ACTION': 'SELECT_ACTION',
+    },
 )
