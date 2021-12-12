@@ -40,7 +40,7 @@ def save_check_handler(update: Update, context: CallbackContext):
         ],
     ]
     update.message.reply_text(
-        'Вы успешно добавили чек',
+        'Чек успешно добавлен',
         reply_markup=InlineKeyboardMarkup(buttons),
     )
     return 'END_ACTION'
@@ -51,7 +51,9 @@ conversation_handler = ConversationHandler(
         CallbackQueryHandler(add_check_handler, pattern='^add_check$'),
     ],
     states={
-        'SAVE_CHECK_ACTION': [MessageHandler(Filters.text, add_check_handler)],
+        'SAVE_CHECK_ACTION': [
+            MessageHandler(Filters.text, save_check_handler),
+        ],
     },
     fallbacks={},
     map_to_parent={
