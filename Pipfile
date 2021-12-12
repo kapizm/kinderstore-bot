@@ -17,6 +17,7 @@ flake8-commas = "*"
 flake8-quotes = "*"
 flake8-import-order = "*"
 flake8-multiline-containers = "*"
+pytest-pythonpath = "*"
 
 [requires]
 python_version = "3.9"
