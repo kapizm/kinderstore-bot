@@ -2,6 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql.expression import null
 
 from src import database
 
@@ -24,7 +25,8 @@ class Check(database.Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     number = Column(String, unique=True, nullable=False)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    registered_at = Column(DateTime)
+    chances = Column(Integer, nullable=False)
+    registered_at = Column(DateTime, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
