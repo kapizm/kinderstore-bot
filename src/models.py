@@ -21,7 +21,7 @@ class Check(database.Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     number = Column(String, unique=True, nullable=False)
-    registered_at = Column(DateTime, nullable=False)
+    registered_at = Column(DateTime)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
 
 
