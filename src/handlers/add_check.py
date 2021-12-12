@@ -4,7 +4,7 @@ from telegram.ext import (
     Filters, MessageHandler,
 )
 
-from src import database
+from src import database, helpers
 from src.models import Check, User
 
 
@@ -16,19 +16,6 @@ def add_check_handler(update: Update, context: CallbackContext):
 
 
 def save_check_handler(update: Update, context: CallbackContext):
-    with database.Session() as session:
-        user = session.query(User).filter(
-            User.telegram_id == update.message.from_user.id,
-        ).first()
-
-    check = Check(
-        number=update.message.text,
-        user_id=user.id,
-    )
-
-    with database.Session() as session, session.begin():
-        session.add(check)
-
     buttons = [
         [
             InlineKeyboardButton(
@@ -39,6 +26,43 @@ def save_check_handler(update: Update, context: CallbackContext):
             InlineKeyboardButton('Мои чеки', callback_data='my_checks'),
         ],
     ]
+
+    with database.Session() as session:
+        check = session.query(Check).filter(
+            Check.number == update.message.text,
+        ).first()
+
+    if check:
+        update.message.reply_text(
+            'Чек уже зарегистрирован',
+            reply_markup=InlineKeyboardMarkup(buttons),
+        )
+        return 'END_ACTION'
+
+    check_data = helpers.get_check_data_from_api(check_number=update.message.text)
+
+    if not check_data:
+        update.message.reply_text(
+            'Чек не найден',
+            reply_markup=InlineKeyboardMarkup(buttons),
+        )
+        return 'END_ACTION'
+
+    with database.Session() as session:
+        user = session.query(User).filter(
+            User.telegram_id == update.message.from_user.id,
+        ).first()
+
+    check = Check(
+        number=update.message.text,
+        user_id=user.id,
+        chances=helpers.get_chances_from_price(check_data['price']),
+        registered_at=check_data['registered_at'],
+    )
+
+    with database.Session() as session, session.begin():
+        session.add(check)
+
     update.message.reply_text(
         'Чек успешно добавлен',
         reply_markup=InlineKeyboardMarkup(buttons),
