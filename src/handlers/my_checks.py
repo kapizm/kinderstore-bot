@@ -1,8 +1,8 @@
-from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import CallbackContext
 
 from src import database
-from src.models import Check, User
+from src.models import User
 
 
 def my_checks_handler(update: Update, context: CallbackContext):
