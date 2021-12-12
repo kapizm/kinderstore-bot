@@ -21,18 +21,22 @@ def start_handler(update: Update, context: CallbackContext):
 
     if user:
         buttons.extend([
-            [InlineKeyboardButton(
-                'Зарегистрировать чек', callback_data='add_check',
-            )],
-            [InlineKeyboardButton(
-                'Мои чеки', callback_data='my_checks',
-            )],
+            [
+                InlineKeyboardButton(
+                    'Зарегистрировать чек', callback_data='add_check',
+                ),
+            ],
+            [
+                InlineKeyboardButton('Мои чеки', callback_data='my_checks'),
+            ],
         ])
     else:
         buttons.append(
-            [InlineKeyboardButton(
-                'Зарегистрироваться', callback_data='registration',
-            )],
+            [
+                InlineKeyboardButton(
+                    'Зарегистрироваться', callback_data='registration',
+                ),
+            ],
         )
 
     update.message.reply_text(
@@ -40,10 +44,6 @@ def start_handler(update: Update, context: CallbackContext):
         reply_markup=InlineKeyboardMarkup(buttons),
     )
     return 'SELECT_ACTION'
-
-
-def add_check_handler(update: Update, context: CallbackContext):
-    update.callback_query.edit_message_text('add_check_handler')
 
 
 def my_checks_handler(update: Update, context: CallbackContext):

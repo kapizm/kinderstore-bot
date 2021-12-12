@@ -47,12 +47,14 @@ def save_instagram_handler(update: Update, context: CallbackContext):
         session.commit()
 
     buttons = [
-        [InlineKeyboardButton(
-            'Зарегистрировать чек', callback_data='add_check',
-        )],
-        [InlineKeyboardButton(
-            'Мои чеки', callback_data='my_checks',
-        )],
+        [
+            InlineKeyboardButton(
+                'Зарегистрировать чек', callback_data='add_check',
+            ),
+        ],
+        [
+            InlineKeyboardButton('Мои чеки', callback_data='my_checks'),
+        ],
     ]
     update.message.reply_text(
         'Вы успешно зарегистрировались',
@@ -67,12 +69,12 @@ conversation_handler = ConversationHandler(
     ],
     states={
         'SAVE_NAME_ACTION': [MessageHandler(Filters.text, save_name_handler)],
-        'SAVE_PHONE_NUMBER_ACTION': [MessageHandler(
-            Filters.text, save_phone_number_handler,
-        )],
-        'SAVE_INSTAGRAM_ACTION': [MessageHandler(
-            Filters.text, save_instagram_handler,
-        )],
+        'SAVE_PHONE_NUMBER_ACTION': [
+            MessageHandler(Filters.text, save_phone_number_handler),
+        ],
+        'SAVE_INSTAGRAM_ACTION': [
+            MessageHandler(Filters.text, save_instagram_handler),
+        ],
     },
     fallbacks=[],
     map_to_parent={
