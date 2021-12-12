@@ -1,9 +1,12 @@
-from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
-from telegram.ext import CommandHandler, ConversationHandler, Updater, CallbackContext, CallbackQueryHandler
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram.ext import (
+    CallbackContext, CallbackQueryHandler, CommandHandler,
+    ConversationHandler, Updater,
+)
 
 from src import config, database
+from src.handlers import add_check, registration
 from src.models import User
-from src.handlers import registration, add_check
 
 bot = Updater(token=config.TOKEN)
 
@@ -18,12 +21,18 @@ def start_handler(update: Update, context: CallbackContext):
 
     if user:
         buttons.extend([
-            [InlineKeyboardButton('Зарегистрировать чек', callback_data='add_check')],
-            [InlineKeyboardButton('Мои чеки', callback_data='my_checks')],
+            [InlineKeyboardButton(
+                'Зарегистрировать чек', callback_data='add_check',
+            )],
+            [InlineKeyboardButton(
+                'Мои чеки', callback_data='my_checks',
+            )],
         ])
     else:
         buttons.append(
-            [InlineKeyboardButton('Зарегистрироваться', callback_data='registration')],
+            [InlineKeyboardButton(
+                'Зарегистрироваться', callback_data='registration',
+            )],
         )
 
     update.message.reply_text(
