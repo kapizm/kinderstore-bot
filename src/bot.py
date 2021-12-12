@@ -5,7 +5,7 @@ from telegram.ext import (
 )
 
 from src import config, database
-from src.handlers import add_check, registration
+from src.handlers import add_check, registration, my_checks
 from src.models import User
 
 bot = Updater(token=config.TOKEN)
@@ -46,10 +46,6 @@ def start_handler(update: Update, context: CallbackContext):
     return 'SELECT_ACTION'
 
 
-def my_checks_handler(update: Update, context: CallbackContext):
-    update.callback_query.edit_message_text('my_checks_handler')
-
-
 def cancel_handler(update: Update, context: CallbackContext):
     update.message.reply_text('Отменено')
     return ConversationHandler.END
@@ -61,7 +57,7 @@ conversation_handler = ConversationHandler(
         'SELECT_ACTION': [
             registration.conversation_handler,
             add_check.conversation_handler,
-            CallbackQueryHandler(my_checks_handler, pattern='^my_checks$'),
+            CallbackQueryHandler(my_checks.my_checks_handler, pattern='^my_checks$'),
         ],
     },
     fallbacks=[CommandHandler('cancel', cancel_handler)],
