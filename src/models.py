@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
 
 from src import database
 
@@ -14,6 +15,7 @@ class User(database.Base):
     phone_number = Column(String)
     ig_account = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
+    checks = relationship('Check', order_by='Check.created_at.desc()')
 
 
 class Check(database.Base):
@@ -21,8 +23,9 @@ class Check(database.Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     number = Column(String, unique=True, nullable=False)
-    registered_at = Column(DateTime)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    registered_at = Column(DateTime)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
 
 metadata = database.Base.metadata
