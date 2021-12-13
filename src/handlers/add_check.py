@@ -39,7 +39,9 @@ def save_check_handler(update: Update, context: CallbackContext):
         )
         return 'END_ACTION'
 
-    check_data = helpers.get_check_data_from_api(check_number=update.message.text)
+    check_data = helpers.get_check_data_from_api(
+        check_number=update.message.text,
+    )
 
     if not check_data:
         update.message.reply_text(

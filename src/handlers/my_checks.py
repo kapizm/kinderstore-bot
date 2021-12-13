@@ -13,8 +13,12 @@ def my_checks_handler(update: Update, context: CallbackContext):
             User.telegram_id == update.callback_query.from_user.id,
         ).join(User.checks).first()
 
-        for check in user.checks:
-            text += f'• {check.number}\n'
+        if user.checks:
+            for check in user.checks:
+                text += f'• {check.number}\n'
+
+        else:
+            update.message.reply('У вас пока нет зарегистрированных чеков')
 
     buttons = [
         [
