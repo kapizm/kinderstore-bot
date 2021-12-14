@@ -1,0 +1,4 @@
+[flake8]
+import-order-style = google
+application-import-names = src
+exclude = src/migrations/versions/*

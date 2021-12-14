@@ -6,11 +6,19 @@ name = "pypi"
 [packages]
 python-telegram-bot = "*"
 python-dotenv = "*"
+alembic = "*"
+psycopg2-binary = "*"
+httpx = "*"
 
 [dev-packages]
 pytest = "*"
 flake8 = "==3.9.2"
 pytest-flake8 = "*"
+flake8-commas = "*"
+flake8-quotes = "*"
+flake8-import-order = "*"
+flake8-multiline-containers = "*"
+pytest-pythonpath = "*"
 
 [requires]
 python_version = "3.9"

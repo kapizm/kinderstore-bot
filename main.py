@@ -1,5 +1,5 @@
-from src.bot import bot
 from src import config
+from src.bot import bot
 
 WEBHOOK_URL_TEMPLATE = 'https://{}.herokuapp.com/{}'
 
