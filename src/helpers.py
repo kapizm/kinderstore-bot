@@ -4,6 +4,7 @@ import httpx
 
 from src import config
 
+
 def get_check_data_from_api(check_number: str):
     with httpx.Client(
         base_url=config.API_BASE_URL,
