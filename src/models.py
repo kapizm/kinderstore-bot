@@ -24,9 +24,16 @@ class Check(database.Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     number = Column(String, unique=True, nullable=False)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    chances = Column(Integer, nullable=False)
     registered_at = Column(DateTime, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+    chances = relationship('Chance', order_by='Chance.check_id')
+
+
+class Chance(database.Base):
+    __tablename__ = 'chances'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    check_id = Column(Integer, ForeignKey('checks.id'), nullable=False)
 
 
 metadata = database.Base.metadata
