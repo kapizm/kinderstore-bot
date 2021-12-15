@@ -5,7 +5,7 @@ from telegram.ext import (
 )
 
 from src import database, helpers
-from src.models import Check, User
+from src.models import Chance, Check, User
 
 
 def add_check_handler(update: Update, context: CallbackContext):
@@ -55,10 +55,19 @@ def save_check_handler(update: Update, context: CallbackContext):
             User.telegram_id == update.message.from_user.id,
         ).first()
 
+    Chances_list = []
+
+    for chance in helpers.get_chances_from_price(check_data['price']):
+        chance = Chance(
+            check_id=check.id,
+        )
+        Chances_list.append(chance)
+        with database.Session() as session, session.begin():
+            session.add(chance)
+
     check = Check(
         number=update.message.text,
         user_id=user.id,
-        chances=helpers.get_chances_from_price(check_data['price']),
         registered_at=check_data['registered_at'],
     )
 
@@ -66,9 +75,13 @@ def save_check_handler(update: Update, context: CallbackContext):
         session.add(check)
 
     update.message.reply_text(
-        'Чек успешно добавлен',
+        'Чек успешно добавлен\n',
+        f'{Chances_list}',
         reply_markup=InlineKeyboardMarkup(buttons),
     )
+
+    Chances_list.clear()
+
     return 'END_ACTION'
 
 

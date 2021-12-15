@@ -11,7 +11,7 @@ def my_checks_handler(update: Update, context: CallbackContext):
     with database.Session() as session:
         user = session.query(User).filter(
             User.telegram_id == update.callback_query.from_user.id,
-        ).join(User.checks).encode('utf-8').first()
+        ).first()
 
         if user.checks:
             for check in user.checks:
