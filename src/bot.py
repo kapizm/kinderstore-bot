@@ -9,7 +9,11 @@ from src.handlers import add_check, my_checks, registration
 from src.models import User
 
 bot = Updater(token=config.TOKEN)
-
+text = (
+    'Здравствуйте!\nРады приветствовать Вас в розыгрыше '
+    '«Игрушки покупай - машину забирай!» от сети детских '
+    'магазинов KinderStore в г. Нур-Султан!'
+)
 
 def start_handler(update: Update, context: CallbackContext):
     with database.Session() as session:
@@ -40,8 +44,7 @@ def start_handler(update: Update, context: CallbackContext):
         )
 
     update.message.reply_text(
-        'Здравствуйте! Выберите действие',
-        reply_markup=InlineKeyboardMarkup(buttons),
+        text, reply_markup=InlineKeyboardMarkup(buttons),
     )
     return 'SELECT_ACTION'
 

@@ -33,6 +33,7 @@ def save_check_handler(update: Update, context: CallbackContext):
         ).first()
 
     if check:
+        print(check)
         update.message.reply_text(
             'Чек уже зарегистрирован',
             reply_markup=InlineKeyboardMarkup(buttons),
@@ -45,7 +46,7 @@ def save_check_handler(update: Update, context: CallbackContext):
 
     if not check_data:
         update.message.reply_text(
-            'Чек не найден',
+            f'Чек не найден {check_data}',
             reply_markup=InlineKeyboardMarkup(buttons),
         )
         return 'END_ACTION'
@@ -55,27 +56,38 @@ def save_check_handler(update: Update, context: CallbackContext):
             User.telegram_id == update.message.from_user.id,
         ).first()
 
-    Chances_list = []
-
-    for chance in helpers.get_chances_from_price(check_data['price']):
-        chance = Chance(
-            check_id=check.id,
+        check = Check(
+            number=update.message.text,
+            user_id=user.id,
+            registered_at=check_data['registered_at'],
         )
-        Chances_list.append(chance)
-        with database.Session() as session, session.begin():
-            session.add(chance)
-
-    check = Check(
-        number=update.message.text,
-        user_id=user.id,
-        registered_at=check_data['registered_at'],
-    )
 
     with database.Session() as session, session.begin():
         session.add(check)
 
+    Chances_list = []
+    chances_counter = helpers.get_chances_from_price(check_data['price'])
+
+    with database.Session() as session:
+        chance = session.query(Chance).filter(
+            User.telegram_id == update.message.from_user.id,
+        ).first()
+
+        while chances_counter > 0:
+            chance = Chance(
+                check_id=check.id,
+            )
+            Chances_list.append(chance)
+            with database.Session() as session, session.begin():
+                session.add(chance)
+            chances_counter -= 1
+
     update.message.reply_text(
-        'Чек успешно добавлен\n',
+        'Дорогой Покупатель!\nПоздравляем вас, вы успешно прошли ',
+        'регистрацию на розыгрыш АВТОМОБИЛЯ Chevrolet Spark! 🚗\n',
+        'Следите за нашим аккаунтом в Инстаграм @kinderstore_astana 😍\n',
+        'Если возникнут вопросы, обращайтесь в тех. поддержку по '
+        'номеру телефона нашего call-центра: +7(702)8777045\n',
         f'{Chances_list}',
         reply_markup=InlineKeyboardMarkup(buttons),
     )
